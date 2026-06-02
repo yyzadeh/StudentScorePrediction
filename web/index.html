@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>داشبورد پیش‌بینی نمره دانشجو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-strong: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.10);
+      --text: rgba(255, 255, 255, 0.96);
+      --muted: rgba(255, 255, 255, 0.68);
+      --soft: rgba(255, 255, 255, 0.45);
+      --shadow: 0 35px 90px rgba(0, 0, 0, 0.38);
+      --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.30);
+      --radius-xl: 32px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+      --orange1: #fb923c;
+      --orange2: #ea580c;
+      --green1: #34d399;
+      --green2: #059669;
+      --blue1: #38bdf8;
+      --blue2: #2563eb;
+      --bgcard: #11151f;
+      --input: #121620;
+      --input-inner: inset 0 2px 8px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+      --card-inner: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .bg-glow,
+    .grid-overlay {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .bg-glow {
+      background:
+        radial-gradient(circle at top right, rgba(59,130,246,0.28), transparent 30%),
+        radial-gradient(circle at top left, rgba(249,115,22,0.22), transparent 26%),
+        radial-gradient(circle at bottom, rgba(15,23,42,0.95), rgba(8,10,15,1));
+    }
+
+    .grid-overlay {
+      opacity: 0.40;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-height: 100vh;
+    }
+
+    .header,
+    .panel,
+    .feature-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--card-inner), var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .header {
+      border-radius: 28px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: right;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(145deg, #38bdf8, #2563eb 55%, #4338ca);
+      box-shadow:
+        inset 0 2px 8px rgba(255,255,255,0.20),
+        0 18px 40px rgba(59,130,246,0.35);
+      flex: 0 0 auto;
+    }
+
+    .logo svg { width: 30px; height: 30px; fill: white; }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: none;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+    }
+
+    .title {
+      margin: 3px 0 0;
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .header-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .tag {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 9px 14px;
+      font-size: 14px;
+      color: var(--muted);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    }
+
+    .hero,
+    .panel {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 28px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    .hero::before {
+      top: 0;
+      right: 0;
+      width: 180px;
+      height: 180px;
+      background: rgba(249,115,22,0.16);
+    }
+
+    .hero::after {
+      left: 0;
+      bottom: 0;
+      width: 240px;
+      height: 240px;
+      background: rgba(56,189,248,0.15);
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 10px 16px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.68);
+    }
+
+    .pill svg { width: 16px; height: 16px; fill: #fdba74; flex: 0 0 auto; }
+
+    .hero h2 {
+      margin: 18px 0 0;
+      font-size: clamp(2.4rem, 4.8vw, 4.6rem);
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      max-width: 680px;
+      font-size: clamp(1rem, 1.3vw, 1.15rem);
+      line-height: 1.9;
+      color: rgba(255,255,255,0.74);
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .stat {
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 30px rgba(0,0,0,0.26);
+    }
+
+    .stat strong { display: block; font-size: 15px; margin-bottom: 4px; }
+    .stat span { font-size: 14px; color: rgba(255,255,255,0.60); }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .cta,
+    .ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 18px;
+      padding: 13px 18px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+      cursor: pointer;
+    }
+
+    .cta:hover,
+    .ghost:hover,
+    .submit:hover,
+    .term-btn:hover { transform: translateY(-1px); }
+
+    .cta {
+      background: linear-gradient(180deg, var(--orange1), var(--orange2));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.24),
+        0 16px 30px rgba(249,115,22,0.26);
+    }
+
+    .ghost {
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      border-color: var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .cta svg,
+    .ghost svg,
+    .small-icon svg,
+    .section-title svg,
+    .submit svg { width: 16px; height: 16px; fill: currentColor; }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h3 {
+      margin: 2px 0 0;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      line-height: 1.25;
+    }
+
+    .panel-label {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.55);
+      margin: 0;
+    }
+
+    .endpoint-pill {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 10px 14px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.72);
+      white-space: nowrap;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field.span-2 { grid-column: 1 / -1; }
+    .field label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.70);
+    }
+
+    .input-shell {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--input);
+      padding: 12px 14px;
+      box-shadow: var(--input-inner);
+    }
+
+    .input-shell input,
+    .input-shell select {
+      width: 100%;
+      border: 0;
+      outline: none;
+      color: var(--text);
+      background: transparent;
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .input-shell input::placeholder { color: rgba(255,255,255,0.25); }
+    .helper { font-size: 12px; color: rgba(255,255,255,0.40); }
+
+    .term-box {
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 16px;
+      margin-top: 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.70);
+      margin-bottom: 14px;
+    }
+
+    .section-title svg { fill: #fdba74; }
+
+    .term-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .term-switch {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+    }
+
+    .term-buttons {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .term-btn {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      color: rgba(255,255,255,0.68);
+      padding: 12px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .term-btn.active {
+      color: white;
+      border-color: rgba(253,186,116,0.30);
+      background: linear-gradient(180deg, var(--orange1), var(--orange2));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.24),
+        0 14px 25px rgba(249,115,22,0.28);
+    }
+
+    .subtle {
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      padding: 12px 14px;
+      color: rgba(255,255,255,0.66);
+      font-size: 14px;
+    }
+
+    .submit-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .submit {
+      border: 1px solid rgba(52,211,153,0.20);
+      background: linear-gradient(180deg, var(--green1), var(--green2));
+      color: white;
+      border-radius: 20px;
+      padding: 14px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.24),
+        0 16px 28px rgba(16,185,129,0.22);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      min-width: 168px;
+    }
+
+    .submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .results {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .result-card {
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: var(--bgcard);
+      padding: 18px;
+      box-shadow: inset 0 2px 16px rgba(0,0,0,0.55);
+      min-height: 150px;
+    }
+
+    .result-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .result-title svg { fill: currentColor; }
+
+    .result-box {
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      min-height: 92px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .prediction-number {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .prediction-note,
+    .empty-note,
+    .error-note {
+      margin-top: 8px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .error-note { color: #fda4af; }
+
+    pre.payload {
+      margin: 0;
+      max-height: 92px;
+      overflow: auto;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.30);
+      padding: 16px;
+      font-size: 12px;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.72);
+      direction: ltr;
+      text-align: left;
+    }
+
+    .bottom-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .feature-card {
+      border-radius: 28px;
+      padding: 18px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      text-align: right;
+    }
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      margin-bottom: 14px;
+    }
+
+    .icon-box svg { width: 20px; height: 20px; fill: rgba(255,255,255,0.85); }
+
+    .feature-card h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .feature-card p {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.60);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .muted { color: var(--muted); }
+
+    @media (max-width: 1080px) {
+      .grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .stat-grid,
+      .results,
+      .form-grid,
+      .term-grid { grid-template-columns: 1fr; }
+      .term-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .submit-row { grid-template-columns: 1fr; }
+      .page { padding: 16px 14px 22px; }
+      .hero { padding: 20px; }
+      .panel { padding: 16px; }
+    }
+
+    @media (max-width: 520px) {
+      .term-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .header { padding: 14px; }
+      .header-left { gap: 12px; }
+      .logo { width: 50px; height: 50px; border-radius: 16px; }
+    }
+
+    /* Optional scroll bar styling */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="grid-overlay"></div>
+
+  <main class="page">
+    <header class="header">
+      <div class="header-left">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2l3.5 7.5L23 12l-7.5 2.5L12 22l-3.5-7.5L1 12l7.5-2.5L12 2zm0 6.2L10.7 10.7 8 12l2.7 1.3L12 15.3l1.3-2L16 12l-2.7-1.3L12 8.2z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">FastAPI · ONNX · سیستم پیش‌بینی نمره دانشجو</p>
+          <h1 class="title">داشبورد پیش‌بینی</h1>
+        </div>
+      </div>
+      <div class="header-tags">
+        <span class="tag">۶ مدل ONNX</span>
+        <span class="tag">ترم ۲ تا ۷</span>
+        <span class="tag">داده ثابت + متغیر</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <section class="hero">
+        <div class="hero-content">
+
+          <h2>پیش‌بینی عملکرد دانشجو با سوابق تحصیلی</h2>
+          <p>
+          </p>
+
+          <div class="stat-grid">
+            <div class="stat"><strong>ورودی‌های ثابت</strong><span>۶ ویژگی آموزشی</span></div>
+            <div class="stat"><strong>ترم‌های پویا</strong><span>1، 2، 3، 4، 5، 6</span></div>
+            <div class="stat"><strong>آماده اتصال</strong><span>JSON + fetch</span></div>
+          </div>
+
+          <div class="cta-row">
+            <a class="cta" href="#predictor">
+              رفتن به فرم
+            </a>
+            <div class="ghost">
+              <svg viewBox="0 0 24 24"><path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1zm-1 16.5L5.5 12l1.4-1.4 4.1 4.1 6.1-6.1 1.4 1.4z"/></svg>
+              متصل به مدل
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="predictor">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">پنل پیش‌بینی</p>
+            <h3>ساخت درخواست متناسب با ترم</h3>
+          </div>
+          <div class="endpoint-pill" id="endpointPill">ترم دوم</div>
+        </div>
+
+        <form id="predictForm">
+          <div class="form-grid">
+            <div class="field span-2 term-switch">
+              <label>انتخاب ترم پیش‌بینی</label>
+              <div class="term-buttons" id="termButtons"></div>
+            </div>
+
+            <div class="field">
+              <label for="diploma_avg">معدل دیپلم</label>
+              <div class="input-shell"><input id="diploma_avg" type="text" inputmode="decimal" value="0" dir="ltr" /></div>
+              <div class="helper">بازه ۰ تا ۲۰</div>
+            </div>
+            <div class="field">
+              <label for="basic_science_avg">معدل علوم پایه</label>
+              <div class="input-shell"><input id="basic_science_avg" type="text" inputmode="decimal" value="0" dir="ltr" /></div>
+              <div class="helper">بازه ۰ تا ۲۰</div>
+            </div>
+            <div class="field">
+              <label for="physiopathology_avg">معدل فیزیولوژی و آسیب‌شناسی</label>
+              <div class="input-shell"><input id="physiopathology_avg" type="text" inputmode="decimal" value="0" dir="ltr" /></div>
+              <div class="helper">بازه ۰ تا ۲۰</div>
+            </div>
+            <div class="field">
+              <label for="clinical_avg">معدل بالینی</label>
+              <div class="input-shell"><input id="clinical_avg" type="text" inputmode="decimal" value="0" dir="ltr" /></div>
+              <div class="helper">بازه ۰ تا ۲۰</div>
+            </div>
+            <div class="field">
+              <label for="internship_avg">معدل کارآموزی</label>
+              <div class="input-shell"><input id="internship_avg" type="text" inputmode="decimal" value="0" dir="ltr" /></div>
+              <div class="helper">بازه ۰ تا ۲۰</div>
+            </div>
+            <div class="field">
+              <label for="medical_course_type">نوع دوره پزشکی</label>
+              <div class="input-shell">
+                <select id="medical_course_type" dir="rtl">
+                  <option value="0">۰ · انترنی</option>
+                  <option value="1">۱ · بالینی</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="term-box">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24"><path d="M7 2a1 1 0 0 0-1 1v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3h-1V3a1 1 0 1 0-2 0v1H8V3a1 1 0 0 0-1-1zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9zM7 11h3v3H7v-3z"/></svg>
+              ورودی‌های پویا برای <span id="termTitle">ترم دوم</span>
+            </div>
+            <div class="term-grid" id="dynamicFields"></div>
+          </div>
+
+          <div class="submit-row">
+            <div class="subtle">ترتیب ویژگی‌ها دقیقاً مطابق آموزش مدل است و به <strong id="endpointInline">/predict_2</strong> ارسال می‌شود.</div>
+            <button class="submit" id="submitBtn" type="submit">
+              <svg viewBox="0 0 24 24"><path d="M5 13l6 6L23 7l-2-2-10 10-4-4-2 2z"/></svg>
+              <span id="submitText">اجرای پیش‌بینی</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="results">
+          <div class="result-card">
+            <div class="result-title">
+              <svg viewBox="0 0 24 24"><path d="M3 13h4l3-8 4 16 3-8h4"/></svg>
+              نتیجه پیش‌بینی
+            </div>
+            <div class="result-box" id="resultBox">
+              <div>
+                <div class="prediction-number" id="predictionValue">—</div>
+                <div class="prediction-note" id="predictionNote">برای مشاهده خروجی، فرم را ارسال کنید.</div>
+                <div class="error-note" id="errorNote" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card">
+            <div class="result-title">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM7 7v10h10V7H7zm2 2h6v2H9V9zm0 4h6v2H9v-2z"/></svg>
+              آخرین payload
+            </div>
+            <pre class="payload" id="payloadPreview">{
+  "note": "هنوز درخواستی ارسال نشده است"
+}</pre>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="bottom-grid">
+      <div class="feature-card">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24"><path d="M12 2l8 8-8 8-8-8 8-8zm0 3.1L7.1 12 12 16.9 16.9 12 12 5.1z"/></svg>
+        </div>
+        <h4>مسیر‌دهی تمیز به ترم‌ها</h4>
+        <p>به‌صورت خودکار payload و endpoint مناسب هر مدل را انتخاب می‌کند.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12 3.4 13.4 9 19l12-12-1.4-1.4z"/></svg>
+        </div>
+        <h4>آماده استفاده در پروژه</h4>
+        <p>برای اتصال به FastAPI، CORS و پاسخ‌های زنده کاملاً مناسب است.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const staticFields = [
+      { key: 'diploma_avg', label: 'معدل دیپلم' },
+      { key: 'basic_science_avg', label: 'معدل علوم پایه' },
+      { key: 'physiopathology_avg', label: 'معدل فیزیولوژی و آسیب‌شناسی' },
+      { key: 'clinical_avg', label: 'معدل بالینی' },
+      { key: 'internship_avg', label: 'معدل کارآموزی' },
+    ];
+
+    const termDynamicFields = {
+      2: ['11'],
+      3: ['11', '12'],
+      4: ['11', '12', '21'],
+      5: ['11', '12', '21', '22'],
+      6: ['11', '12', '21', '22', '31'],
+      7: ['11', '12', '21', '22', '31', '32'],
+    };
+
+    const termTitles = {
+      2: 'ترم دوم',
+      3: 'ترم سوم',
+      4: 'ترم چهارم',
+      5: 'ترم پنجم',
+      6: 'ترم ششم',
+      7: 'ترم هفتم',
+    };
+
+    const dynamicLabels = {
+      '11': 'ترم 1',
+      '12': 'ترم 2',
+      '21': 'ترم 3',
+      '22': 'ترم 4',
+      '31': 'ترم 5',
+      '32': 'ترم 6',
+    };
+
+    const state = {
+      term: 2,
+      apiBase: '',
+      form: {
+        diploma_avg: '0',
+        basic_science_avg: '0',
+        physiopathology_avg: '0',
+        clinical_avg: '0',
+        internship_avg: '0',
+        medical_course_type: '0',
+        '11': '0',
+        '12': '0',
+        '21': '0',
+        '22': '0',
+        '31': '0',
+        '32': '0',
+      },
+      loading: false,
+      prediction: null,
+      error: null,
+      lastPayload: null,
+    };
+
+    const el = {
+      apiBase: document.getElementById('apiBase'),
+      medical_course_type: document.getElementById('medical_course_type'),
+      termButtons: document.getElementById('termButtons'),
+      dynamicFields: document.getElementById('dynamicFields'),
+      termTitle: document.getElementById('termTitle'),
+      endpointPill: document.getElementById('endpointPill'),
+      endpointInline: document.getElementById('endpointInline'),
+      resultBox: document.getElementById('resultBox'),
+      predictionValue: document.getElementById('predictionValue'),
+      predictionNote: document.getElementById('predictionNote'),
+      errorNote: document.getElementById('errorNote'),
+      payloadPreview: document.getElementById('payloadPreview'),
+      submitBtn: document.getElementById('submitBtn'),
+      submitText: document.getElementById('submitText'),
+      predictForm: document.getElementById('predictForm'),
+    };
+
+    function endpointForTerm(term) {
+      return `/predict_${term}`;
+    }
+
+    function renderTermButtons() {
+      el.termButtons.innerHTML = '';
+      [2, 3, 4, 5, 6, 7].forEach((term) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `term-btn ${state.term === term ? 'active' : ''}`;
+        btn.textContent = String(term);
+        btn.addEventListener('click', () => {
+          state.term = term;
+          renderAll();
+        });
+        el.termButtons.appendChild(btn);
+      });
+    }
+
+    function renderDynamicFields() {
+      const fields = termDynamicFields[state.term];
+      el.dynamicFields.innerHTML = '';
+
+      fields.forEach((field) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.innerHTML = `
+          <label for="${field}">${dynamicLabels[field]}</label>
+          <div class="input-shell"><input id="${field}" type="text" inputmode="decimal" value="${state.form[field]}" dir="ltr" /></div>
+        `;
+        el.dynamicFields.appendChild(wrap);
+      });
+    }
+
+    function renderAll() {
+      const endpoint = endpointForTerm(state.term);
+      el.termTitle.textContent = termTitles[state.term];
+      el.endpointPill.textContent = `${termTitles[state.term]}`;
+      el.endpointInline.textContent = endpoint;
+      renderTermButtons();
+      renderDynamicFields();
+      syncInputs();
+      attachInputHandlers();
+      updateResultUI();
+    }
+
+    function syncInputs() {
+      el.apiBase.value = state.apiBase;
+      el.medical_course_type.value = state.form.medical_course_type;
+      staticFields.forEach(({ key }) => {
+        const input = document.getElementById(key);
+        if (input) input.value = state.form[key];
+      });
+      termDynamicFields[state.term].forEach((key) => {
+        const input = document.getElementById(key);
+        if (input) input.value = state.form[key];
+      });
+    }
+
+    function sanitizeNumericText(value) {
+      const trimmed = String(value).trim();
+      if (trimmed === '') return '0';
+      if (trimmed === '.') return '0.';
+      if (/^-?\d+$/.test(trimmed)) return String(Number(trimmed));
+      if (/^-?\d*\.\d*$/.test(trimmed)) {
+        if (trimmed === '-0.' || trimmed === '0.') return trimmed;
+        const parts = trimmed.split('.');
+        const integer = parts[0] === '' || parts[0] === '-' ? '0' : String(Number(parts[0]));
+        return `${integer}.${parts[1] ?? ''}`;
+      }
+      return trimmed;
+    }
+
+    function attachSmartNumberInput(input, key) {
+      if (!input || input.dataset.bound === '1') return;
+      input.dataset.bound = '1';
+
+      input.addEventListener('input', () => {
+        const raw = input.value;
+        const cleaned = sanitizeNumericText(raw);
+        state.form[key] = cleaned;
+        if (cleaned !== raw) input.value = cleaned;
+      });
+
+      input.addEventListener('blur', () => {
+        const cleaned = sanitizeNumericText(input.value);
+        state.form[key] = cleaned;
+        input.value = cleaned;
+      });
+
+      input.addEventListener('focus', () => {
+        // Keep the visible zero, but make typing feel natural.
+        if (input.value === '0') {
+          setTimeout(() => {
+            try { input.setSelectionRange(1, 1); } catch (e) {}
+          }, 0);
+        }
+      });
+    }
+
+    function attachInputHandlers() {
+      el.apiBase.oninput = (e) => { state.apiBase = e.target.value; };
+      el.medical_course_type.onchange = (e) => { state.form.medical_course_type = e.target.value; };
+
+      staticFields.forEach(({ key }) => {
+        const input = document.getElementById(key);
+        if (input) attachSmartNumberInput(input, key);
+      });
+
+      termDynamicFields[state.term].forEach((key) => {
+        const input = document.getElementById(key);
+        if (input) attachSmartNumberInput(input, key);
+      });
+    }
+
+    function toNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function updateResultUI() {
+      if (state.loading) {
+        el.submitText.textContent = 'در حال پیش‌بینی...';
+        el.submitBtn.disabled = true;
+      } else {
+        el.submitText.textContent = 'اجرای پیش‌بینی';
+        el.submitBtn.disabled = false;
+      }
+
+      if (state.prediction !== null) {
+        el.predictionValue.textContent = state.prediction.toFixed(4);
+        el.predictionNote.textContent = 'خروجی دریافت‌شده از مدل ONNX';
+        el.errorNote.style.display = 'none';
+      } else if (state.error) {
+        el.predictionValue.textContent = '—';
+        el.predictionNote.textContent = 'آدرس API یا وضعیت بک‌اند را بررسی کنید.';
+        el.errorNote.style.display = 'block';
+        el.errorNote.textContent = state.error;
+      } else {
+        el.predictionValue.textContent = '—';
+        el.predictionNote.textContent = 'برای مشاهده خروجی، فرم را ارسال کنید.';
+        el.errorNote.style.display = 'none';
+      }
+
+      el.payloadPreview.textContent = JSON.stringify(state.lastPayload ?? { note: 'هنوز درخواستی ارسال نشده است' }, null, 2);
+    }
+
+    function buildPayload() {
+      const payload = {
+        diploma_avg: toNumber(state.form.diploma_avg),
+        basic_science_avg: toNumber(state.form.basic_science_avg),
+        physiopathology_avg: toNumber(state.form.physiopathology_avg),
+        clinical_avg: toNumber(state.form.clinical_avg),
+        internship_avg: toNumber(state.form.internship_avg),
+        medical_course_type: toNumber(state.form.medical_course_type),
+      };
+
+      termDynamicFields[state.term].forEach((field) => {
+        payload[field] = toNumber(state.form[field]);
+      });
+
+      return payload;
+    }
+
+    function clearErrorAndResult() {
+      state.prediction = null;
+      state.error = null;
+    }
+
+    el.predictForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrorAndResult();
+      state.loading = true;
+      updateResultUI();
+
+      const base = String(state.apiBase || '').replace(/\/$/, '');
+      const endpoint = endpointForTerm(state.term);
+      const payload = buildPayload();
+      state.lastPayload = payload;
+      updateResultUI();
+
+      try {
+        const res = await fetch(`${base}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.detail || 'درخواست با خطا مواجه شد');
+        }
+
+        state.prediction = Number(data.prediction);
+      } catch (err) {
+        state.error = err?.message || 'پیش‌بینی انجام نشد';
+      } finally {
+        state.loading = false;
+        updateResultUI();
+      }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
