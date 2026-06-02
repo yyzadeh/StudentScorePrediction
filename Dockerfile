@@ -25,9 +25,7 @@ RUN adduser \
 # Copy only the dependency files first — layer stays cached until they change
 COPY pyproject.toml uv.lock ./
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project
-
+RUN uv sync --frozen
 # Activate the venv for all subsequent commands
 ENV PATH="/app/.venv/bin:$PATH"
 
