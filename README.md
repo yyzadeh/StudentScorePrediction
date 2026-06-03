@@ -36,3 +36,21 @@ Because a student gains more semester records as they progress through their aca
 2. **Dynamic Semesters:** Depending on the target term selected (Terms 2 to 7), the system dynamically appends prior term scores as input features.
 3. **Z-Score Scaling:** Raw inputs are standardized on-the-fly inside FastAPI using pre-saved standard scaling parameters (`mean` and `std`) computed during the notebook training phase.
 4. **ONNX Inference:** The normalized feature array is passed to its respective LightGBM ONNX engine to produce the final predicted score.
+
+---
+
+## 📁 Project Structure
+
+```text
+├── ONNX student score predictor/
+│   ├── LGBMModel12.onnx               # ONNX Model for Term 2 Prediction
+│   ├── LGBMModel21.onnx               # ONNX Model for Term 3 Prediction
+│   ├── ...                            # Continuous sequential models up to Term 7
+│   ├── scaling_params12.json          # Extracted Mean & Std arrays for normalization
+│   └── ...                            # Scaling parameters matching each model
+├── web/
+│   └── index.html                     # RTL Dashboard UI (Jinja2 Template target)
+├── main.py                            # Core FastAPI Web Server & Router
+├── requirements.txt                   # Project dependencies
+└── README.md                          # Repository documentation
+```
