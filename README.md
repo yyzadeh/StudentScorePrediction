@@ -7,8 +7,8 @@ The production app is optimized for low-latency inference and is fully deployed 
 ---
 
 ## 🚀 Live Demo & Deployment
-* **Backend & Frontend URL:** [Insert your Railway App URL here]
-* **Environment:** Python 3.10+ / FastAPI / ONNX Runtime
+* **Backend & Frontend URL:** [[Insert your Railway App URL here](https://studentscoreprediction-production.up.railway.app/)]
+* **Environment:** Python 3.11.0+ / FastAPI / ONNX Runtime
 
 ---
 
