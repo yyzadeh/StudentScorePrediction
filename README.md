@@ -54,5 +54,3 @@ Because a student gains more semester records as they progress through their aca
 ├── requirements.txt                   # Project dependencies
 └── README.md                          # Repository documentation
 ```
-
-🛣️ API Endpoints ReferenceThe backend exposes separate POST endpoints for each target semester to isolate validation schemas and structural requirements:EndpointTarget PredictionStatic FeaturesDynamic Term InputsPOST /predict_2Term 2 Score6 base featuresTerm 1 (11)POST /predict_3Term 3 Score6 base featuresTerm 1 (11), Term 2 (12)POST /predict_4Term 4 Score6 base featuresTerm 1, Term 2, Term 3 (21)POST /predict_5Term 5 Score6 base featuresTerm 1, Term 2, Term 3, Term 4 (22)POST /predict_6Term 6 Score6 base featuresTerm 1 through Term 5 (31)POST /predict_7Term 7 Score6 base featuresTerm 1 through Term 6 (32)
