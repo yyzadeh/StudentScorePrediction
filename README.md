@@ -38,6 +38,26 @@ Because a student gains more semester records as they progress through their aca
 4. **ONNX Inference:** The normalized feature array is passed to its respective LightGBM ONNX engine to produce the final predicted score.
 
 ---
+## 📊 Model Performance & Evaluation (RMSE)
+
+The system's predictive accuracy follows a progressive learning curve based on the depth of the student's academic history. 
+
+In the early stages (`predict_2`), the model exhibits its highest Root Mean Squared Error (RMSE) because it relies on minimal historical data (only Term 1 scores). As the student advances through the semesters, subsequent models ingest a significantly richer chronological dataset containing cumulative prior term performance (`f11`, `f12`, up to `f32`). This expanding feature space allows the higher-term models to capture long-term academic trends and stability, resulting in a much more accurate and reliable prediction with highly optimized RMSE scores in later semesters.
+
+### Evaluation Metrics Table
+
+| Endpoint | Target Prediction | Total Input Features | Root Mean Squared Error (RMSE) |
+| :--- | :--- | :---: | :---: |
+| `POST /predict_2` | Term 2 Score | 7 Features | **0.510485** |
+| `POST /predict_3` | Term 3 Score | 8 Features | **0.227783** |
+| `POST /predict_4` | Term 4 Score | 9 Features | **0.252987** |
+| `POST /predict_5` | Term 5 Score | 10 Features | **0.165417** |
+| `POST /predict_6` | Term 6 Score | 11 Features | **0.214747** |
+| `POST /predict_7` | Term 7 Score | 12 Features | **0.192535** |
+
+> 💡 **Key Insight:** The drop in RMSE from **0.510** down to **0.192** demonstrates that the inclusion of sequential historical data dramatically improves the model's capacity to minimize variance and forecast future grades with high precision.
+
+---
 
 ## 📁 Project Structure
 
